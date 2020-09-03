@@ -29,11 +29,9 @@ def noise_to_pixel(x, y, base_freq=0.01, octaves=16, persistence=0.5, valrange=(
     )
     """Generate the noise in range [-1,1]"""
 
-    # adjnoise = noise - noise_low
-    # slope = (high - low) / (noise_high - noise_low)
-    # pixelval = (adjnoise * slope) + low
+    pixel = ((noise + 1) * 255) / 2
     # """Initially in [-1, 1], needs shifting to [0, 255]"""
-    return np.uint8(noise)
+    return np.uint8(pixel)
 
 
 def brownian(
@@ -63,10 +61,10 @@ def brownian(
 
         scaledx, scaledy = x * freq, y * freq
         """Scale the position to the frequency"""
-        noiseval = simplex2d(scaledx, scaledy) * amp
+        noise_val = simplex2d(scaledx, scaledy) * amp
         """Simplex noise comes out as a float on [-1,1]"""
 
-        noise_sum += noiseval
+        noise_sum += noise_val
         amp_sum += amp
         amp *= gain
         freq *= 2
@@ -74,5 +72,5 @@ def brownian(
         for every successive octave
         """
 
-    # noise /= amp_sum
-    return noise_sum
+    # noise_sum /= amp_sum
+    return max(min(noise_sum, 1), -1)
