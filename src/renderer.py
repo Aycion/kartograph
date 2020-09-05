@@ -1,9 +1,16 @@
-from PIL import Image
+from PIL import Image, ImagePalette
 import matplotlib.pyplot as plt
 
 
 def heightmap_to_image(heightmap, save=False):
-    return Image.fromarray(heightmap, mode='L')
+    img = Image.fromarray(heightmap, mode='L')
+    return img
+
+
+def heightmap_to_color_img(heightmap):
+    pal_array = []
+
+    # palette = ImagePalette(mode="RGB")
 
 
 def display_image(im):

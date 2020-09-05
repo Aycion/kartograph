@@ -20,8 +20,6 @@ def noise_to_pixel(x, y, base_freq=0.01, octaves=16, persistence=0.5, valrange=(
         np.uint8: The brownian noise value for (x, y)
 
     """
-    noise_low, noise_high = (-1, 1)
-    """Value range for each channel (inclusive)"""
 
     noise = brownian(
         x, y,
@@ -46,7 +44,7 @@ def brownian(
         freq (float):
         amp (float): The amplitude of the wave function in the first octave
         gain (float): The degree to which the amplitude diminishes
-            in each successive octave. Also called persistence
+            in each successive octave. Also called persistence.
 
     Returns:
 
@@ -56,10 +54,12 @@ def brownian(
     """float: accumulator for the noise"""
     amp_sum = 0.0
     """float: accumulator for the amplitudes"""
+
     for octv in range(octaves):
         """Sum the noise functions over each octave"""
 
         scaledx, scaledy = x * freq, y * freq
+
         """Scale the position to the frequency"""
         noise_val = simplex2d(scaledx, scaledy) * amp
         """Simplex noise comes out as a float on [-1,1]"""
