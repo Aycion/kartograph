@@ -3,7 +3,7 @@ from typing import Callable
 import numpy as np
 import math
 
-from src.graphics import DEFAULT_RES
+from heightmaps.graphics import DEFAULT_RES
 
 
 def square_gradient_eval(coord, centroid, grade):
@@ -23,11 +23,11 @@ def subtract_gradient(alpha_map, gradient, limit=255):
     same dimensions. Subtracts elements in `gradient`
      from corresponding elements in `alpha_map`.
     Args:
-        alpha_map:
-        gradient:
-        limit:
+    :param alpha_map:
+    :param gradient:
+    :param limit:
 
-    Returns:
+    :return:
 
     """
     if len(alpha_map) != len(gradient) or len(alpha_map[0]) != len(gradient[0]):
