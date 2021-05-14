@@ -3,7 +3,14 @@ from typing import Callable
 import numpy as np
 import math
 
-from heightmaps.graphics import DEFAULT_RES
+from src import DEFAULT_RES
+
+
+class GradientFactory:
+    def __init__(self, dims=None):
+        x, *y = dims or (DEFAULT_RES,)
+        self.rx, self.ry = x, y[0] if y else x
+        self.cx, self.cy = self.rx // 2, self.ry // 2
 
 
 def square_gradient_eval(coord, centroid, grade):
