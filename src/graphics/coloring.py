@@ -6,11 +6,15 @@ def get_default_colors(norm=False):
     colors = {
         # Labeled tuples of (height, r, g, b)
         'min': (0, 45, 15, 128),
-        'ocean': (100, 45, 15, 128),
-        'coast': (100, 194, 178, 128),
+        'ocean_depth_boundary': (0, 45, 15, 128),
+        'ocean_shallow': (70, 87, 63, 153),
+        'ocean_coastal': (105, 175, 238, 238),
+        'coastline': (110, 194, 178, 128),
         'grass': (120, 65, 152, 10),
+        'plains': (160, 130, 123, 69),
         'stone': (200, 136, 140, 141),
-        'max':   (255, 255, 255, 255)
+        'snow': (230, 240, 240, 240),
+        'max': (255, 255, 255, 255)
     }
     return {
         k: tuple(x * scale for x in y)
@@ -36,7 +40,6 @@ def get_default_cdict():
 def get_cmap(cdict=None):
     cdict = cdict or get_default_cdict()
     return matplotlib.colors.LinearSegmentedColormap('terrain_cmap', cdict, 256)
-
 
 
 class MapColoring:
