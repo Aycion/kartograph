@@ -44,7 +44,7 @@ class WorldParameters(object):
 
     @x.setter
     def x(self, value):
-        self._x = int(value)
+        self._x = value
 
     @property
     def y(self):
@@ -52,7 +52,7 @@ class WorldParameters(object):
 
     @y.setter
     def y(self, value):
-        self._y = int(value)
+        self._y = value
 
     @property
     def dims(self):
@@ -60,7 +60,6 @@ class WorldParameters(object):
 
     @dims.setter
     def dims(self, value):
-
         self.x = value[0]
         self.y = value[1]
         self._dims = value
