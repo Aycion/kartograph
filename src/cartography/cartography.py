@@ -1,12 +1,24 @@
 from src.math.noise import FractalNoiseController
+from configuration import *
 from functools import *
 
 
 class WorldMap:
 
     def __init__(self, mapdata, params=None):
+        if not isinstance(self.params, WorldParameters):
+            raise AttributeError
+
         self.mapdata = mapdata
         self.params = params
+
+    @classmethod
+    def create_map(cls, gen, params=None):
+        layers = None
+        params = params or CONFIG
+
+        map = gen(params)
+        return cls.__init__(map)
 
 
 class EnginePipe:
@@ -21,14 +33,13 @@ class EnginePipe:
 
 
 class WorldParameters(object):
-    def __init__(self, **kwargs):
-        self.cfg = kwargs
-        # self.enginename()
+    def __init__(self, dict_cfg):
+        self.cfg = dict_cfg
         self.enginename = self.cfg.get('engine').get('lib')
         self.seed = self.cfg.get('engine').get('seed')
-        self.dims = self.cfg.get('renderer').get('space').get('shape')
+        self.dims = self.cfg.get('renderer', {}).get('space', {}).get('shape')
 
-        self.controller = FractalNoiseController(engine=self.enginename, seed=self.seed, cfg=self.cfg)
+        self.controller = FractalNoiseController(cfg=self.cfg, seed=self.seed, engine=self.enginename)
 
     @property
     def enginename(self):

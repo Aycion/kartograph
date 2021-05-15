@@ -8,21 +8,25 @@ from src.math.noise import FractalNoiseController
 
 class WorldEngine:
     def __init__(self, dims, engine='opensimplex', seed=0, cfg=None):
-        self.params = WorldParameters(**cfg)
+        self.params = WorldParameters(cfg)
         self.seed = seed
 
         # TODO - extract the following block to a separate configuration validator
         # if not isinstance(dims, tuple):
         #     raise TypeError(f'Shape must be a tuple of ints, got: {dims}')
 
-        self.controller = FractalNoiseController(engine=engine, seed=seed, cfg=cfg)
+        self.controller = FractalNoiseController(cfg=cfg, seed=seed, engine=engine)
         """The controller provides an interface for accumulating noise on a 2D grid.
         """
 
-    def create(self, passes=1):
-        return self.integrate_noise(num_passes=passes)
+    def __call__(self, *args, **kwargs):
+        self.create(*args, **kwargs)
 
-    def integrate_noise(self, num_passes=1):
+    def create(self, layers=None):
+        layers = layers or self.params.cfg.get("")
+        return self.integrate_noise(layers=layers)
+
+    def integrate_noise(self, layers=None):
         """Generate one or more 2D arrays of noise evaluated
             at a base frequency and zero or more consecutive frequencies
             calculated as a multiple of the base.
@@ -32,7 +36,7 @@ class WorldEngine:
             image rendered at scale), while the former is the number of discrete
             layers at which to evalute the noise.
 
-        :param int num_passes: The number of layers to generate in the fractal
+        :param int layers: The number of layers to generate in the fractal
             noise calculation.
 
         :param int seed:
@@ -40,10 +44,11 @@ class WorldEngine:
         :return:
         :rtype: np.ndarray
         """
+        layers = layers or self.params
         cmat = (
             np.linspace(0, self.params.y - 1, self.params.y),
             np.linspace(0, self.params.x - 1, self.params.x),
-            np.linspace(0, num_passes - 1, num_passes)
+            np.linspace(0, layers - 1, layers)
         )
         px, py, pz = np.meshgrid(*cmat, indexing='xy')
         """Get the coordinate grids describing our 3D matrix of values"""
@@ -73,3 +78,9 @@ class WorldEngine:
         oldmin, oldmax = np.min(array), np.max(array)
         array = ((array - oldmin) / (oldmax - oldmin))
         return (array * (newmax - newmin)) + newmin
+
+
+class EngineParameters(object):
+    def __init__(self, **kwargs):
+        self.cfg = kwargs
+        self.enginename = self.cfg.get('engine').get('lib')
