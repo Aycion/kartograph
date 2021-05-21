@@ -1,3 +1,5 @@
+import copy
+
 from src.math.noise import FractalNoiseController
 from configuration import *
 from functools import *
@@ -13,11 +15,11 @@ class WorldMap:
         self.params = params
 
     @classmethod
-    def create_map(cls, gen, params=None):
+    def create_map(cls, engine, params=None):
         layers = None
         params = params or CONFIG
 
-        map = gen(params)
+        map = engine(params)
         return cls.__init__(map)
 
 
@@ -34,20 +36,16 @@ class EnginePipe:
 
 class WorldParameters(object):
     def __init__(self, dict_cfg):
-        self.cfg = dict_cfg
-        self.enginename = self.cfg.get('engine').get('lib')
-        self.seed = self.cfg.get('engine').get('seed')
-        self.dims = self.cfg.get('renderer', {}).get('space', {}).get('shape')
+        self.engine = {}
+        self.space = {}
+        self.accumulator = {}
+        self._cfg_carbon = copy.copy(dict_cfg)
+        self.__dict__.update(dict_cfg)
 
-        self.controller = FractalNoiseController(cfg=self.cfg, seed=self.seed, engine=self.enginename)
+        self.x = self.space.get('shape')[0]
+        self.y = self.space.get('shape')[1]
 
-    @property
-    def enginename(self):
-        return self.__enginename
-
-    @enginename.setter
-    def enginename(self, value):
-        self.__enginename = value
+        self.controller = FractalNoiseController(cfg=self._cfg_carbon, seed=self.engine.get('seed'), engine=self.engine.get('lib'))
 
     @property
     def x(self):
@@ -64,21 +62,21 @@ class WorldParameters(object):
     @y.setter
     def y(self, value):
         self._y = value
-
-    @property
-    def dims(self):
-        return self._dims
-
-    @dims.setter
-    def dims(self, value):
-        self.x = value[0]
-        self.y = value[1]
-        self._dims = value
-
-    @property
-    def seed(self):
-        return self._seed
-
-    @seed.setter
-    def seed(self, value):
-        self._seed = value
+    #
+    # @property
+    # def dims(self):
+    #     return self._dims
+    #
+    # @dims.setter
+    # def dims(self, value):
+    #     self.x = value[0]
+    #     self.y = value[1]
+    #     self._dims = value
+    #
+    # @property
+    # def seed(self):
+    #     return self._seed
+    #
+    # @seed.setter
+    # def seed(self, value):
+    #     self._seed = value

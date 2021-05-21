@@ -23,10 +23,11 @@ class WorldEngine:
         self.create(*args, **kwargs)
 
     def create(self, layers=None):
-        layers = layers or self.params.cfg.get("")
+        layers = layers or self.params.accumulator.get('octaves')
+
         return self.integrate_noise(layers=layers)
 
-    def integrate_noise(self, layers=None):
+    def integrate_noise(self, layers):
         """Generate one or more 2D arrays of noise evaluated
             at a base frequency and zero or more consecutive frequencies
             calculated as a multiple of the base.
@@ -44,7 +45,6 @@ class WorldEngine:
         :return:
         :rtype: np.ndarray
         """
-        layers = layers or self.params
         cmat = (
             np.linspace(0, self.params.y - 1, self.params.y),
             np.linspace(0, self.params.x - 1, self.params.x),

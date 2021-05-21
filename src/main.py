@@ -40,12 +40,12 @@ def app(res):
 def main():
     logging.basicConfig(level=logging.INFO)
     cfg = CONFIG.copy()
-    res = (cfg.get('renderer').get('resolution'),)*2
+    res = (cfg.get('space'))
     topo, biome = app(res)
     worldmap = WorldEngine.rescale(topo + biome)
 
-    plot_with_colors(worldmap)
-    # plot_with_colors(biomes, 'Blues')
+    # plot_with_colors(worldmap)
+    plot_with_colors(biome, 'Blues_r')
     cworld = heightmap_to_color_img(worldmap)
     ctopo = heightmap_to_color_img(topo)
     cbiome = heightmap_to_color_img(biome, colormap="Blues")
