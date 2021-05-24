@@ -12,7 +12,9 @@ from opensimplex import OpenSimplex
 import logging
 from abc import ABCMeta, abstractmethod
 
+from cartography.cartography import WorldParameters
 from configuration import *
+
 
 class FractalNoiseController:
 
@@ -25,18 +27,19 @@ class FractalNoiseController:
 
         return inst
 
-    def __init__(self, cfg=CONFIG, seed=None, engine='opensimplex'):
+    def __init__(self, cfg=None):
         """
 
-        :param engine:
-        :param seed:
+        :param WorldParameters cfg:
         """
-        self.cfg = cfg
-        self.seed = seed or cfg.get('engine').get('seed')
+        self.cfg = cfg or WorldParameters(CONFIG)
+
+        enginelib = cfg.engine.get('lib')
+        seed = cfg.engine.get('seed')
         self.wavefn = WaveFunction.from_cfg(cfg)
         # noise_lib = NoiseLibWrapper(engine, seed)
         try:
-            self.engine = NoiseLibWrapper.init_2d_engine(engine=engine, seed=seed)
+            self.engine = NoiseLibWrapper.init_2d_engine(libname=enginelib, seed=seed)
         except KeyError as e:
             raise ValueError('Invalid option for noise engine') from e
 
@@ -88,7 +91,7 @@ class WaveFunction:
 
     @classmethod
     def from_cfg(cls, cfg):
-        wave = cfg.get('accumulator').get('wave')
+        wave = cfg.accumulator.get('wave')
         return cls(**wave)
 
     def __setattr__(self, key, value):
@@ -124,8 +127,8 @@ class NoiseLibWrapper(metaclass=ABCMeta):
         }
 
     @staticmethod
-    def init_2d_engine(engine, seed=0):
-        if engine == 'opensimplex':
+    def init_2d_engine(libname, seed=0):
+        if libname == 'opensimplex':
             return OpenSimplexWrapper(seed)
         # elif engine == 'pynoise':
         #     return perlin.SimplexNoise()

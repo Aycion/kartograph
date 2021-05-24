@@ -7,23 +7,20 @@ from src.math.noise import FractalNoiseController
 
 
 class WorldEngine:
-    def __init__(self, dims, engine='opensimplex', seed=0, cfg=None):
+    def __init__(self, cfg=None):
         self.params = WorldParameters(cfg)
-        self.seed = seed
 
         # TODO - extract the following block to a separate configuration validator
         # if not isinstance(dims, tuple):
         #     raise TypeError(f'Shape must be a tuple of ints, got: {dims}')
 
-        self.controller = FractalNoiseController(cfg=cfg, seed=seed, engine=engine)
+        self.controller = FractalNoiseController(cfg=cfg)
         """The controller provides an interface for accumulating noise on a 2D grid.
         """
 
-    def __call__(self, *args, **kwargs):
-        self.create(*args, **kwargs)
-
-    def create(self, layers=None):
-        layers = layers or self.params.accumulator.get('octaves')
+    def __call__(self, params=None):
+        params = params or self.params
+        layers = params.accumulator.get('octaves')
 
         return self.integrate_noise(layers=layers)
 

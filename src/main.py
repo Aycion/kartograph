@@ -2,6 +2,7 @@ import argparse
 
 from multiprocessing import Pool
 
+from cartography.cartography import WorldParameters, WorldMap
 from planetology.engine import WorldEngine
 from src.cartography.climatology import MoistureMap
 from src.renderer import *
@@ -19,9 +20,14 @@ def app(res):
     :rtype:
     """
     cfg = CONFIG.copy()
+    topocfg = WorldParameters(cfg)
+    biomecfg = WorldParameters(cfg)
+    biomecfg.seed(23452345)
 
-    topogen = WorldEngine(res, engine='opensimplex', cfg=cfg)
-    climagen = MoistureMap(res, engine='opensimplex', cfg=cfg, seed=23452345)
+    worldgen = WorldEngine(engine='opensimplex', cfg=cfg)
+
+    topo = WorldMap.create(worldgen)
+    moisture = MoistureMap(engine='opensimplex', cfg=cfg)
 
     passes = cfg.get('accumulator')['octaves']
     # topogen.config_noise(**(cfg.get('wave', cfg.get('accumulator')['wave'])))
@@ -29,7 +35,7 @@ def app(res):
     # biome = climagen.create(passes=cfg.get('accumulator')['octaves'])
     # return topogen.create(passes)
     with Pool(2) as pool:
-        map_results = [pool.apply_async(f.create, (passes, )) for f in [topogen, climagen]]
+        map_results = [pool.apply_async(f.create, (passes, )) for f in [topogen, moisture]]
         maps = [res.get() for res in map_results]
 
     topo, biome = maps

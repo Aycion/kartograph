@@ -1,17 +1,9 @@
 import numpy as np
 
-from planetology.engine import WorldEngine
+from cartography.cartography import WorldMap
 
 
-class MoistureMap(WorldEngine):
-
-    def create(self, layers=None):
-        moist = super().create(layers)
-        u = moist.flatten().mean()
-        sd = moist.flatten().std()
-
-        moist[moist < u-sd] = np.nan
-        return moist
+class MoistureMap(WorldMap):
 
     def gen_moisture_map(self):
         pass

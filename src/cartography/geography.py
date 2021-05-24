@@ -1,8 +1,7 @@
-from planetology.engine import WorldEngine
+from cartography.cartography import WorldMap
 
 
-class TerrainMap(WorldEngine):
+class TerrainMap(WorldMap):
 
-    def __init__(self, xbound, ybound, engine='opensimplex'):
-        super().__init__((xbound, ybound), engine)
-
+    def gen_terrain_map(self):
+        pass

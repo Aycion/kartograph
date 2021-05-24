@@ -7,20 +7,20 @@ from functools import *
 
 class WorldMap:
 
-    def __init__(self, mapdata, params=None):
-        if not isinstance(self.params, WorldParameters):
-            raise AttributeError
+    def __new__(cls, mapdata, params=None):
+        cls.params = params if params and isinstance(params, WorldParameters) else WorldParameters(CONFIG)
+        return super().__new__()
 
+    def __init__(self, mapdata, params):
         self.mapdata = mapdata
         self.params = params
 
     @classmethod
-    def create_map(cls, engine, params=None):
-        layers = None
-        params = params or CONFIG
+    def create(cls, engine, params=None):
+        params = params or engine.params
 
         map = engine(params)
-        return cls.__init__(map)
+        return WorldMap(map, params)
 
 
 class EnginePipe:
@@ -73,10 +73,11 @@ class WorldParameters(object):
     #     self.y = value[1]
     #     self._dims = value
     #
-    # @property
-    # def seed(self):
-    #     return self._seed
-    #
-    # @seed.setter
-    # def seed(self, value):
-    #     self._seed = value
+
+    @property
+    def seed(self):
+        return self.engine.get('seed')
+
+    @seed.setter
+    def seed(self, value):
+        self.engine.update(seed=value)
