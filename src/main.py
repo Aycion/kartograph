@@ -10,18 +10,17 @@ from src.configuration import *
 import logging
 
 
-def app(res):
+def app():
     """
 
-    :param ndarray res:
     :param dict options:
     :return:
     :rtype:
     """
     cfg = CONFIG.copy()
 
-    topogen = WorldEngine(res, engine='opensimplex', cfg=cfg)
-    climagen = MoistureMap(res, engine='opensimplex', cfg=cfg, seed=23452345)
+    topogen = WorldEngine(engine='opensimplex', cfg=cfg)
+    climagen = MoistureMap(engine='opensimplex', cfg=cfg, seed=23452345)
 
     passes = cfg.get('accumulator')['octaves']
     # topogen.config_noise(**(cfg.get('wave', cfg.get('accumulator')['wave'])))
@@ -39,9 +38,7 @@ def app(res):
 
 def main():
     logging.basicConfig(level=logging.INFO)
-    cfg = CONFIG.copy()
-    res = (cfg.get('renderer').get('resolution'),)*2
-    topo, biome = app(res)
+    topo, biome = app()
     worldmap = WorldEngine.rescale(topo + biome)
 
     plot_with_colors(worldmap)

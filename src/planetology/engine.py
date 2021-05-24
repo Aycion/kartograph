@@ -7,7 +7,7 @@ from src.math.noise import FractalNoiseController
 
 
 class WorldEngine:
-    def __init__(self, dims, engine='opensimplex', seed=0, cfg=None):
+    def __init__(self, engine='opensimplex', seed=0, cfg=None):
         self.params = WorldParameters(**cfg)
         self.seed = seed
 
