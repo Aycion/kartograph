@@ -1,13 +1,13 @@
 from pathlib import Path
 import re
 
-__all__ = ['DEFAULT_BUILD_DIR', 'validate_fname']
+__all__ = ['DEFAULT_BUILD_DIR', 'enumerate_filename']
 
 
 DEFAULT_BUILD_DIR = (Path(__file__).parent.parent / '../images').resolve()
 
 
-def validate_fname(_dir, fname):
+def enumerate_filename(_dir, fname):
     """
 
     :param Path _dir:

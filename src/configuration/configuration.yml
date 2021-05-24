@@ -1,14 +1,12 @@
 engine:
   lib: "opensimplex"
   seed: 0
-renderer:
-  space:
-    rank: 2
-    aspect: 1
-    shape:
-      - 720
-      - 720
-
+space:
+  rank: 2
+  aspect: 1
+  shape:
+    - 720
+    - 720
 accumulator:
   octaves: 4
   wave:
