@@ -3,7 +3,7 @@ import argparse
 from multiprocessing import Pool
 
 from cartography.cartography import WorldParameters, WorldMap
-from planetology.engine import WorldEngine
+from planetology.engine import WorldFactory
 from src.cartography.climatology import MoistureMap
 from src.renderer import *
 from src.configuration import *
@@ -24,7 +24,7 @@ def app(res):
     biomecfg = WorldParameters(cfg)
     biomecfg.seed(23452345)
 
-    worldgen = WorldEngine(engine='opensimplex', cfg=cfg)
+    worldgen = WorldFactory(engine='opensimplex', cfg=cfg)
 
     topo = WorldMap.create(worldgen)
     moisture = MoistureMap(engine='opensimplex', cfg=cfg)
@@ -48,7 +48,7 @@ def main():
     cfg = CONFIG.copy()
     res = (cfg.get('space'))
     topo, biome = app(res)
-    worldmap = WorldEngine.rescale(topo + biome)
+    worldmap = WorldFactory.rescale(topo + biome)
 
     # plot_with_colors(worldmap)
     plot_with_colors(biome, 'Blues_r')

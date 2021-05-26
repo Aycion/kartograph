@@ -1,6 +1,6 @@
 import copy
 
-from src.math.noise import FractalNoiseController
+from src.math.noise import FBMFunction
 from configuration import *
 from functools import *
 
@@ -45,7 +45,7 @@ class WorldParameters(object):
         self.x = self.space.get('shape')[0]
         self.y = self.space.get('shape')[1]
 
-        self.controller = FractalNoiseController(cfg=self._cfg_carbon, seed=self.engine.get('seed'), engine=self.engine.get('lib'))
+        self.controller = FBMFunction(cfg=self._cfg_carbon, seed=self.engine.get('seed'), engine=self.engine.get('lib'))
 
     @property
     def x(self):

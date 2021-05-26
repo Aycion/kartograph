@@ -3,18 +3,20 @@ import timeit
 import numpy as np
 
 from cartography.cartography import WorldParameters
-from src.math.noise import FractalNoiseController
+from configuration import CONFIG
+from src.math.noise import FBMFunction, WaveFunction
 
 
-class WorldEngine:
+class WorldFactory:
     def __init__(self, cfg=None):
-        self.params = WorldParameters(cfg)
+        self.params = WorldParameters(cfg or CONFIG)
 
         # TODO - extract the following block to a separate configuration validator
         # if not isinstance(dims, tuple):
         #     raise TypeError(f'Shape must be a tuple of ints, got: {dims}')
 
-        self.controller = FractalNoiseController(cfg=cfg)
+        wavefn = WaveFunction.from_cfg(cfg)
+        self.controller = FBMFunction(wavefn=wavefn, **cfg.engine)
         """The controller provides an interface for accumulating noise on a 2D grid.
         """
 
@@ -50,7 +52,7 @@ class WorldEngine:
         px, py, pz = np.meshgrid(*cmat, indexing='xy')
         """Get the coordinate grids describing our 3D matrix of values"""
         start = timeit.default_timer()
-        layers = self.controller.fractal_noise(px, py, pz)
+        layers = self.controller.fbm_layer2d(px, py, pz)
         end = timeit.default_timer()
         print(f'Time: {end - start}\n')
         procedural_noise = layers.sum(axis=2)
@@ -59,8 +61,6 @@ class WorldEngine:
         """
         return procedural_noise
 
-    def config_noise(self, **kwargs):
-        self.controller.configure_wavefunction(**kwargs)
 
     @staticmethod
     def rescale(array, newmin=0, newmax=1):

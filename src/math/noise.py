@@ -16,48 +16,43 @@ from cartography.cartography import WorldParameters
 from configuration import *
 
 
-class FractalNoiseController:
+class FBMFunction:
+    """
+    """
+
+    def __init__(self, wavefn, lib=None, seed=None):
+        """
+
+        """
+
+        self.wavefn = wavefn
+        try:
+            self.engine = NoiseLibWrapper.init_2d_engine(libname=lib, seed=seed)
+        except KeyError as e:
+            raise ValueError('Invalid option for noise engine') from e
 
     def __new__(cls, *args, **kwargs):
         """Modify the class with a vectorized version of the fractal noise function.
 
         """
         inst = super().__new__(cls)
-        inst.fractal_noise = np.vectorize(inst.fractal_noise_scalar)
+        inst.fbm_layer2d = np.vectorize(inst.fbm_scalar)
 
         return inst
 
-    def __init__(self, cfg=None):
+    @classmethod
+    def from_cfg(cls, cfg, wavefn=None):
         """
 
+        :param WaveFunction wavefn:
         :param WorldParameters cfg:
-        """
-        self.cfg = cfg or WorldParameters(CONFIG)
-
-        enginelib = cfg.engine.get('lib')
-        seed = cfg.engine.get('seed')
-        self.wavefn = WaveFunction.from_cfg(cfg)
-        # noise_lib = NoiseLibWrapper(engine, seed)
-        try:
-            self.engine = NoiseLibWrapper.init_2d_engine(libname=enginelib, seed=seed)
-        except KeyError as e:
-            raise ValueError('Invalid option for noise engine') from e
-
-    def configure_wavefunction(self, frequency=None, amplitude=None, lacunarity=None, gain=None):
-        """Set the mathematical parameters that govern the behavior of the wave function.
-
-        :param frequency:
-        :param amplitude:
-        :param lacunarity:
-        :param gain:
         :return:
         """
-        self.wavefn.frequency = frequency or self.wavefn.frequency
-        self.wavefn.amplitude = amplitude or self.wavefn.amplitude
-        self.wavefn.lacunarity = lacunarity or self.wavefn.lacunarity
-        self.wavefn.gain = gain or self.wavefn.gain
+        wavefn = wavefn or WaveFunction.from_cfg(cfg)
+        return cls(wavefn=wavefn, **cfg.engine)
 
-    def fractal_noise_scalar(self, X, Y, Z):
+
+    def fbm_scalar(self, X, Y, Z):
         """Calculate and return the 2D-noise value corresponding to the coordinate (X,Y), scaled
             to an octave according to the Z-value and the parameters that define the WaveFunction.
 
