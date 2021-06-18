@@ -2,8 +2,8 @@ import argparse
 
 from multiprocessing import Pool
 
-from cartography.cartography import WorldParameters, WorldMap
-from planetology.engine import WorldFactory
+from cartography.cartography import WorldMap
+from planetology.factory_core import WorldFactory
 from src.cartography.climatology import MoistureMap
 from src.renderer import *
 from src.configuration import *
@@ -11,33 +11,26 @@ from src.configuration import *
 import logging
 
 
-def app(res):
+def app(config=None):
     """
 
-    :param ndarray res:
-    :param dict options:
+    :param dict config:
     :return:
     :rtype:
     """
-    cfg = CONFIG.copy()
-    topocfg = WorldParameters(cfg)
-    biomecfg = WorldParameters(cfg)
-    biomecfg.seed(23452345)
+    config = config or CONFIG.copy()
+    topoparams = WorldParameters(config)
+    biomeparams = WorldParameters(config)
+    biomeparams.octaves = 2
+    biomeparams.seed = 23452345
 
-    worldgen = WorldFactory(engine='opensimplex', cfg=cfg)
+    worldgen = WorldFactory(cfg_dict=config)
 
-    topo = WorldMap.create(worldgen)
-    moisture = MoistureMap(engine='opensimplex', cfg=cfg)
-
-    passes = cfg.get('accumulator')['octaves']
-    # topogen.config_noise(**(cfg.get('wave', cfg.get('accumulator')['wave'])))
-    # topo = topogen.create(passes=cfg.get('accumulator')['octaves'])
-    # biome = climagen.create(passes=cfg.get('accumulator')['octaves'])
-    # return topogen.create(passes)
-    with Pool(2) as pool:
-        map_results = [pool.apply_async(f.create, (passes, )) for f in [topogen, moisture]]
-        maps = [res.get() for res in map_results]
-
+    # with Pool(2) as pool:
+    #     map_results = [pool.apply_async(worldgen.__call__, (canv, ), {'params': par}) for canv, par in [
+    #         (WorldMap, topoparams), (MoistureMap, biomeparams)]]
+    #     maps = [res.get() for res in map_results]
+    maps = [worldgen(canv, params=par) for canv, par in [(WorldMap, topoparams), (MoistureMap, biomeparams)]]
     topo, biome = maps
 
     return topo, biome
@@ -46,19 +39,21 @@ def app(res):
 def main():
     logging.basicConfig(level=logging.INFO)
     cfg = CONFIG.copy()
-    res = (cfg.get('space'))
-    topo, biome = app(res)
-    worldmap = WorldFactory.rescale(topo + biome)
+    topo, biome = app(cfg)
+    worldmap = WorldFactory.rescale(topo() + biome())
 
     # plot_with_colors(worldmap)
-    plot_with_colors(biome, 'Blues_r')
+    # plot_with_colors(biome(), 'Blues_r')
+
+    craw = heightmap_to_image(WorldFactory.rescale(topo(), 0, 255))
     cworld = heightmap_to_color_img(worldmap)
-    ctopo = heightmap_to_color_img(topo)
-    cbiome = heightmap_to_color_img(biome, colormap="Blues")
+    ctopo = heightmap_to_color_img(topo())
+    cbiome = heightmap_to_color_img(biome(), colormap="Blues")
     # display_image(hmap_im_color)
+    save_image(craw, name='raw.png', folder='raw')
     save_image(cworld, name="compound.png")
-    save_image(ctopo, name="topo.png")
-    save_image(cbiome, name="biome.png")
+    save_image(ctopo, name="topo.png", folder='topo')
+    save_image(cbiome, name="biome.png", folder='biome')
 
 
 if __name__ == '__main__':

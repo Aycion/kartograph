@@ -15,7 +15,7 @@ class Renderer:
         if build_target:
             self.build_target = build_target.resolve()
         else:
-            self.build_target = DEFAULT_BUILD_DIR
+            self.build_target = DEFAULT_IMAGE_DIR
 
     def save_image(self, im, name=None, folder=None):
         """
@@ -30,12 +30,12 @@ class Renderer:
             name = 'hmap.png'
             folder /= 'tests'
 
-        target = enumerate_filename(folder, name)
+        target = enumerate_basename(folder, name)
         target.parent.mkdir(parents=True, exist_ok=True)
         im.save(target.as_posix())
 
     def heightmap_to_image(self, heightmap):
-        img = Image.fromarray(heightmap, mode='L')
+        img = Image.fromarray(heightmap.astype(np.uint8), mode='L')
         return img
 
     def heightmap_to_color_img(self, heightmap, colormap=None):

@@ -12,13 +12,20 @@ from opensimplex import OpenSimplex
 import logging
 from abc import ABCMeta, abstractmethod
 
-from cartography.cartography import WorldParameters
+from configuration import get_root_context
+from configuration.parameters import WorldParameters
 from configuration import *
 
 
+class ContextFunction:
+    """Defines a context for a wave function
+    """
+    def __init__(self, wavefn=None, params=None):
+        params = params or get_root_context()
+        self.waveparams = params.default_controller.get('wave')
+
+
 class FBMFunction:
-    """
-    """
 
     def __init__(self, wavefn, lib=None, seed=None):
         """
@@ -27,34 +34,34 @@ class FBMFunction:
 
         self.wavefn = wavefn
         try:
-            self.engine = NoiseLibWrapper.init_2d_engine(libname=lib, seed=seed)
+            self.engine = NoiseLibWrapper.noise_lib_factory(libname=lib, seed=seed)
         except KeyError as e:
-            raise ValueError('Invalid option for noise engine') from e
+            raise ValueError('Invalid option for noise factory') from e
 
     def __new__(cls, *args, **kwargs):
         """Modify the class with a vectorized version of the fractal noise function.
 
         """
         inst = super().__new__(cls)
-        inst.fbm_layer2d = np.vectorize(inst.fbm_scalar)
+        inst.fbm3d = np.vectorize(inst.fbm_scalar)
 
         return inst
 
     @classmethod
-    def from_cfg(cls, cfg, wavefn=None):
+    def from_params(cls, params, wavefn=None):
         """
 
         :param WaveFunction wavefn:
-        :param WorldParameters cfg:
+        :param WorldParameters params:
         :return:
         """
-        wavefn = wavefn or WaveFunction.from_cfg(cfg)
-        return cls(wavefn=wavefn, **cfg.engine)
-
+        wavefn = wavefn or WaveFunction.from_params(params)
+        return cls(wavefn=wavefn, **params.engine)
 
     def fbm_scalar(self, X, Y, Z):
-        """Calculate and return the 2D-noise value corresponding to the coordinate (X,Y), scaled
-            to an octave according to the Z-value and the parameters that define the WaveFunction.
+        """Calculate and return the 2D-noise value at (X,Y), with periodic
+        fuction parameters scaled to
+        scaled to Z with their respective step functions
 
         :param X:
         :param Y:
@@ -79,14 +86,14 @@ class WaveFunction:
     def __init__(self, amplitude=1.0, frequency=0.01,
                  gain=0.5, lacunarity=2.0):
 
-        self.amplitude = amplitude
-        self.frequency = frequency
-        self.gain = gain
-        self.lacunarity = lacunarity
+        self.amplitude = amplitude      # A
+        self.frequency = frequency      # v
+        self.gain = gain                # G
+        self.lacunarity = lacunarity    # L
 
     @classmethod
-    def from_cfg(cls, cfg):
-        wave = cfg.accumulator.get('wave')
+    def from_params(cls, params):
+        wave = params.controller.get('wave')
         return cls(**wave)
 
     def __setattr__(self, key, value):
@@ -122,10 +129,10 @@ class NoiseLibWrapper(metaclass=ABCMeta):
         }
 
     @staticmethod
-    def init_2d_engine(libname, seed=0):
+    def noise_lib_factory(libname, seed=0):
         if libname == 'opensimplex':
             return OpenSimplexWrapper(seed)
-        # elif engine == 'pynoise':
+        # elif factory == 'pynoise':
         #     return perlin.SimplexNoise()
         else:
             raise ValueError('Invalid option for noise library.')

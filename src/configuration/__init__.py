@@ -1,12 +1,20 @@
 import yaml
 from pathlib import Path
 
-__all__ = ["CONFIG"]
+from .parameters import WorldParameters
+
+
+def get_root_context():
+    return _ROOT_CONTEXT
+
+
+__all__ = ['CONFIG', 'WorldParameters']
 
 
 def load_configuration():
-    cfgFile = Path(__file__).parent/"configuration.yml"
-    return yaml.load(cfgFile.open("r"), Loader=yaml.Loader)
+    cfg_yml = Path(__file__).parent/'configuration.yml'
+    return yaml.load(cfg_yml.open('r'), Loader=yaml.Loader)
 
 
 CONFIG = load_configuration()
+_ROOT_CONTEXT = WorldParameters(CONFIG)

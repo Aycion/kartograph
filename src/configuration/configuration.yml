@@ -7,7 +7,7 @@ space:
   shape:
     - 720
     - 720
-accumulator:
+controller:
   octaves: 4
   wave:
     amplitude: 1
