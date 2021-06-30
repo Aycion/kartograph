@@ -1,4 +1,4 @@
-from cartography.cartography import WorldMap
+from generator.cartography.cartography import WorldMap
 
 
 class TerrainMap(WorldMap):

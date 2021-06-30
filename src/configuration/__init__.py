@@ -1,14 +1,14 @@
 import yaml
 from pathlib import Path
 
-from .parameters import WorldParameters
+from .parameters import GlobalParameters
 
 
 def get_root_context():
     return _ROOT_CONTEXT
 
 
-__all__ = ['CONFIG', 'WorldParameters']
+__all__ = ['CONFIG', 'GlobalParameters', 'get_root_context']
 
 
 def load_configuration():
@@ -17,4 +17,4 @@ def load_configuration():
 
 
 CONFIG = load_configuration()
-_ROOT_CONTEXT = WorldParameters(CONFIG)
+_ROOT_CONTEXT = GlobalParameters(CONFIG)

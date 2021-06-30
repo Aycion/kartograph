@@ -1,16 +1,17 @@
 from pathlib import Path
 import re
 
-__all__ = ['DEFAULT_IMAGE_DIR', 'enumerate_basename']
+__all__ = ['DEFAULT_IMAGE_DIR', 'basename_enum']
 
 
 DEFAULT_IMAGE_DIR = (Path(__file__).parent.parent / '../images').resolve()
 
 
-def enumerate_basename(_dir, basename):
+def basename_enum(_dir, basename):
     """
 
     :param Path _dir:
+
     :param str basename:
     :return:
     """

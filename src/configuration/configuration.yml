@@ -1,7 +1,8 @@
 engine:
   lib: "opensimplex"
   seed: 0
-space:
+output:
+  name: "topo"
   rank: 2
   aspect: 1
   shape:

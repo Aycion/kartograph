@@ -17,7 +17,7 @@ class Renderer:
         else:
             self.build_target = DEFAULT_IMAGE_DIR
 
-    def save_image(self, im, name=None, folder=None):
+    def save_image(self, im, name, folder=None):
         """
 
         :param Image im:
@@ -26,11 +26,12 @@ class Renderer:
         :return:
         """
         folder = folder or self.build_target
+
         if not name:
             name = 'hmap.png'
-            folder /= 'tests'
+            folder = folder / 'tests' / name
 
-        target = enumerate_basename(folder, name)
+        target = basename_enum(folder, name)
         target.parent.mkdir(parents=True, exist_ok=True)
         im.save(target.as_posix())
 

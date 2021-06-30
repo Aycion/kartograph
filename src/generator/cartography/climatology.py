@@ -1,6 +1,4 @@
-import numpy as np
-
-from cartography.cartography import WorldMap
+from generator.cartography.cartography import WorldMap
 
 
 class MoistureMap(WorldMap):

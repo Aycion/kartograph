@@ -1,7 +1,5 @@
 import numpy as np
 
-from configuration import *
-
 
 class WorldMap:
 
@@ -24,7 +22,7 @@ class WorldMap:
     def from_canvas(cls, canvas, params):
         """
         :param numpy.ndarray canvas:
-        :param WorldParameters params:
+        :param GlobalParameters params:
         :return:
         """
         return cls(canvas, params)
@@ -32,6 +30,14 @@ class WorldMap:
     def combine_with_layer(self, map_layer, weights=None):
         if weights is None:
             weights = np.ones_like(map_layer)
+
+    def __add__(self, other):
+        summed = self.canvas + other.canvas
+        return WorldMap(canvas=summed, params=self.params)
+
+    def __radd__(self, other):
+        summed = other.canvas + self.canvas
+        return WorldMap(canvas=summed, params=other.params)
 
 
 class EnginePipe:

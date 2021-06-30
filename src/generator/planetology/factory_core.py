@@ -3,16 +3,19 @@ import timeit
 import numpy as np
 from multiprocessing import Pool
 
-# from contextlib import asynccontextmanager
-from cartography.cartography import WorldMap
-from configuration.parameters import WorldParameters
+from generator.cartography.cartography import WorldMap
+from configuration.parameters import GlobalParameters
 from configuration import CONFIG
-from src.math.noise import FBMFunction, WaveFunction
+from generator.noise import FBMFunction, WaveFunction
 
 
 class WorldFactory:
     def __init__(self, cfg_dict=None):
-        self.default_params = WorldParameters(cfg_dict or CONFIG)
+        """Factory object in charge of creating composite
+
+        :param cfg_dict:
+        """
+        self.default_params = GlobalParameters(cfg_dict or CONFIG)
 
         # TODO - extract the following block to a separate configuration validator
         # if not isinstance(dims, tuple):
@@ -26,11 +29,12 @@ class WorldFactory:
     def from_params(cls, params):
         """
 
-        :param WorldParameters params:
+        :param GlobalParameters params:
         :return:
         """
         inst = cls()
         inst.default_params = params
+        return inst
 
     class Illustrator:
         def __init__(self, tools):
@@ -52,7 +56,12 @@ class WorldFactory:
             chunkcount = len(mz)
 
             with Pool(chunkcount) as pool:
-                map_results = [pool.apply_async(self.do_fbm, (px, py, Z)) for Z in mz]
+                map_results = [
+                    pool.apply_async(
+                        self.generate_mesh_layer, (px, py, Z)
+                    ) for Z in mz
+                ]
+                # map_results[0].
                 maps = np.stack([res.get() for res in map_results], axis=0)
 
             end = timeit.default_timer()
@@ -64,7 +73,7 @@ class WorldFactory:
 
             return procedural_canvas
 
-        def do_fbm(self, *mesh):
+        def generate_mesh_layer(self, *mesh):
             """Generate one or more 2D arrays of noise evaluated
                 at a base frequency and zero or more consecutive frequencies
                 calculated as a multiple of the base.
@@ -113,7 +122,7 @@ class WorldFactory:
 
     def make_canvas(self, params=None):
         params = params or self.default_params
-        xbound, ybound = params.space.get('shape')
+        xbound, ybound = params.output.get('shape')
         zbound = params.controller.get('octaves')
 
         # TODO test swapping x/y

@@ -13,7 +13,7 @@ import logging
 from abc import ABCMeta, abstractmethod
 
 from configuration import get_root_context
-from configuration.parameters import WorldParameters
+from configuration.parameters import GlobalParameters
 from configuration import *
 
 
@@ -52,7 +52,7 @@ class FBMFunction:
         """
 
         :param WaveFunction wavefn:
-        :param WorldParameters params:
+        :param GlobalParameters params:
         :return:
         """
         wavefn = wavefn or WaveFunction.from_params(params)

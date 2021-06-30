@@ -1,14 +1,14 @@
 import copy
 
 
-class WorldParameters(object):
+class GlobalParameters(object):
     """An object that provides access to a set of parameters defining a
     context for an entire operation.
     """
     def __init__(self, dict_cfg):
         self.engine = {}
         """dict: context for the wrapper on the underlying noise library"""
-        self.space = {}
+        self.output = {}
         """dict: context for the output array: rank, aspect ratio, and shape"""
         self.controller = {}
         """dict: context for the default_controller generating output"""
@@ -16,8 +16,16 @@ class WorldParameters(object):
         """dict: deep copy of the original configuration"""
         self.__dict__.update({d: copy.copy(v) for d,v in dict_cfg.items()})
 
-        self.x = self.space.get('shape')[0]
-        self.y = self.space.get('shape')[1]
+        self.x = self.output.get('shape')[0]
+        self.y = self.output.get('shape')[1]
+
+    @property
+    def name(self):
+        return self.output.get('name')
+
+    @name.setter
+    def name(self, value):
+        self.output.update(name=value)
 
     @property
     def x(self):
@@ -37,7 +45,7 @@ class WorldParameters(object):
 
     @property
     def shape(self):
-        return self.space.get('shape')
+        return self.output.get('shape')
 
     @property
     def octaves(self):
